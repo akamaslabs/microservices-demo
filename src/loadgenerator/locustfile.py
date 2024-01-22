@@ -20,6 +20,7 @@ from locust import HttpUser, TaskSet, between
 
 THINK_TIME_MIN = float(os.getenv("THINK_TIME_MIN", "1"))
 THINK_TIME_MAX = float(os.getenv("THINK_TIME_MAX", "10"))
+headers = {'Connection':'close'}
 
 products = [
     '0PUK6V6EV0',
@@ -34,29 +35,31 @@ products = [
 
 
 def index(l):
-    l.client.get("/")
+    l.client.get("/", headers=headers)
 
 
 def setCurrency(l):
     currencies = ['EUR', 'USD', 'JPY', 'CAD']
     l.client.post("/setCurrency",
-                  {'currency_code': random.choice(currencies)})
+                  {'currency_code': random.choice(currencies)},
+                  headers=headers)
 
 
 def browseProduct(l):
-    l.client.get("/product/" + random.choice(products))
+    l.client.get("/product/" + random.choice(products), headers=headers)
 
 
 def viewCart(l):
-    l.client.get("/cart")
+    l.client.get("/cart", headers=headers)
 
 
 def addToCart(l):
     product = random.choice(products)
-    l.client.get("/product/" + product)
+    l.client.get("/product/" + product, headers=headers)
     l.client.post("/cart", {
         'product_id': product,
-        'quantity': random.choice([1, 2, 3, 4, 5, 10])})
+        'quantity': random.choice([1, 2, 3, 4, 5, 10])},
+        headers=headers)
 
 
 def checkout(l):
@@ -72,7 +75,7 @@ def checkout(l):
         'credit_card_expiration_month': '1',
         'credit_card_expiration_year': '2039',
         'credit_card_cvv': '672',
-    })
+    }, headers=headers)
 
 
 class UserBehavior(TaskSet):
